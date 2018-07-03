@@ -3,8 +3,11 @@ import logo from './mainStreetAuto.svg';
 import axios from 'axios';
 import './App.css';
 
+
 // Toast notification dependencies
 import { ToastContainer, toast } from 'react-toastify';
+
+const baseUrl = 'http://joes-autos.herokuapp.com/api';
 
 class App extends Component {
   constructor(props) {
@@ -31,6 +34,13 @@ class App extends Component {
   getVehicles() {
     // axios (GET)
     // setState with response -> vehiclesToDisplay
+    let promise = axios.get(baseUrl + '/vehicles')
+
+    promise.then((result) => {
+      toast.success("Successfully got all vehicles.")
+      this.setState({
+        vehiclesToDisplay: result.data })
+    }).catch( () => toast.error('Failed at Fetching Vehicles'))
   }
 
   getPotentialBuyers() {
@@ -41,6 +51,12 @@ class App extends Component {
   sellCar(id) {
     // axios (DELETE)
     // setState with response -> vehiclesToDisplay
+
+    axios.delete(baseUrl + '/vehicles/' + id).then((response) => {
+      toast.success('Successfully sold the car.')
+      this.setState({
+        vehiclesToDisplay: response.data.vehicles })
+    }).catch( () => toast.error('Failed to sell vehicle.'))
   }
 
   filterByMake() {
@@ -48,6 +64,12 @@ class App extends Component {
 
     // axios (GET)
     // setState with response -> vehiclesToDisplay
+    axios.get(baseUrl + '/vehicles?make=' + make)
+        .then(response => {
+          this.setState({
+            vehiclesToDisplay: response.data
+          })
+        })
   }
 
   filterByColor() {
@@ -60,6 +82,13 @@ class App extends Component {
   updatePrice(priceChange, id) {
     // axios (PUT)
     // setState with response -> vehiclesToDisplay
+    axios.put(baseUrl + `/vehicles/${id}/${priceChange}`)
+          .then((response) => {
+            toast.success('Successfully updated the price.')
+            this.setState({
+              vehiclesToDisplay: response.data.vehicles
+            }).catch( () => toast.error('Failed to update the price.'))
+          })
   }
 
   addCar() {
@@ -73,6 +102,14 @@ class App extends Component {
 
     // axios (POST)
     // setState with response -> vehiclesToDisplay
+    let promise = axios.post(baseUrl + '/vehicles', newCar)
+
+    promise.then((response) => {
+      toast.success('Successfully added the vehicle')
+      this.setState({
+        vehiclesToDisplay: response.data.vehicles
+      })
+    }).catch( () => toast.error('Failed to add the new vehicle.'))
   }
 
   addBuyer() {
